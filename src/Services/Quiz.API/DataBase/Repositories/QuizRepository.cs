@@ -32,4 +32,14 @@ public class QuizRepository : IQuizRepository
     {
         return await _collectionQuize.Find(x => x.Id == id).FirstOrDefaultAsync();
     }
+
+    public async Task UpdateAsync(string id, Quiz quiz)
+    {
+        await _collectionQuize.ReplaceOneAsync(x => x.Id == id, quiz);
+    }
+
+    public async Task DeleteAsync(string id)
+    {
+        await _collectionQuize.DeleteOneAsync(x => x.Id == id);
+    }
 }

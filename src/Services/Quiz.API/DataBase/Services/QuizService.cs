@@ -48,7 +48,6 @@ public class QuizService
             quiz.Questions.Select(q => new QuestionForUserDto(q.Id, q.Text, q.Options)).ToList()
         );
     }
-
     public async Task<string> CreateQuizAsync(CreateQuizRequest request)
     {
         var quiz = new Quiz
@@ -65,5 +64,33 @@ public class QuizService
 
         await _quizRepository.CreateAsync(quiz);
         return quiz.Id!;
+    }
+    public async Task<bool> UpdateQuizAsync(string id, CreateQuizRequest reques) 
+    {
+        var exists = await _quizRepository.GetByIdAsync(id);
+
+        //if quiz doesn't exist return false
+        if (exists == null) return false;
+
+        //updating quiz
+        exists.Title = reques.Title;
+        exists.Description = reques.Description;
+        exists.Questions = reques.Questions.Select(q => new Question
+        {
+            Text = q.Text,
+            Options = q.Options,
+            CorrectOptionIndex = q.CorrectOptionIndex
+        }).ToList();
+
+        await _quizRepository.UpdateAsync(id, exists);
+        return true;
+    }
+    public async Task<bool> DeleteQuizAsync(string id) 
+    {
+        var exists = await _quizRepository.GetByIdAsync(id);
+        if (exists == null) return false;
+
+        await _quizRepository.DeleteAsync(id);
+        return true;
     }
 }

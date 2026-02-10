@@ -24,6 +24,7 @@ public class QuizController(QuizService quizService) : ControllerBase
         var id = await quizService.CreateQuizAsync(request);
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
+
     [HttpPost("{id}/submit")]
     public async Task<IActionResult> Submit(string id, [FromBody] SubmitQuizRequest request) 
     {
@@ -31,4 +32,18 @@ public class QuizController(QuizService quizService) : ControllerBase
         if (!result) return NotFound();
         return Accepted(new { message = "Submission acccepted for proccessing"});
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(string id, CreateQuizRequest request)
+    {
+        var result = await quizService.UpdateQuizAsync(id, request);
+        return result ? NoContent() : NotFound();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var result = await quizService.DeleteQuizAsync(id);
+        return result ? Ok(new { message = "Deleted" }) : NotFound();
+    }   
 }
