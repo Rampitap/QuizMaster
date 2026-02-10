@@ -3,31 +3,53 @@ using Grading.Worker.Consumer;
 using Grading.Worker.Data;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
-var builder = Host.CreateApplicationBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("ApplicationName", "Grading.Worker")
+    .WriteTo.Console()
+    .WriteTo.Seq("http://localhost:5341")
+    .CreateLogger();
 
-builder.Services.AddDbContext<GradingDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+try 
+{ 
+    Log.Information("Grading.Worker is starting");
 
-builder.Services.AddMassTransit(x => 
-{
-    x.AddConsumer<SubmissionConsumer>();
+    var builder = Host.CreateApplicationBuilder(args);
 
-    x.UsingRabbitMq((context, cfg) => 
+    builder.Services.AddDbContext<GradingDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+    builder.Services.AddMassTransit(x => 
     {
-        cfg.Host("localhost", "/", h => {
-            h.Username("guest");
-            h.Password("guest");
+        x.AddConsumer<SubmissionConsumer>();
+
+        x.UsingRabbitMq((context, cfg) => 
+        {
+            cfg.Host("localhost", "/", h => {
+                h.Username("guest");
+                h.Password("guest");
+            });
+
+            cfg.ConfigureEndpoints(context);
         });
-
-        cfg.ConfigureEndpoints(context);
     });
-});
 
-builder.Services.AddGrpcClient<QuizGrpc.QuizGrpcClient>(o =>
+    builder.Services.AddGrpcClient<QuizGrpc.QuizGrpcClient>(o =>
+    {
+        o.Address = new Uri("https://localhost:7052"); 
+    });
+
+    var host = builder.Build();
+    host.Run();
+}
+catch (Exception ex)
 {
-    o.Address = new Uri("https://localhost:7052"); 
-});
-
-var host = builder.Build();
-host.Run();
+    Log.Fatal(ex, "Grading.Worker terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

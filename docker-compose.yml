@@ -95,15 +95,13 @@ services:
       retries: 5
 
   seq:
-    image: datalust/seq:latest
+    image: datalust/seq:2024.3
     container_name: seq
     restart: unless-stopped
     environment:
-      - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_NOAUTHENTICATION=Y
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
     ports:
       - "5341:80"
-    volumes:
-      - seq-data:/data
     networks:
       - quiz-network
