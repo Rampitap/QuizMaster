@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/EventBus.Messages/EventBus.Messages.csproj" />
+  </Folder>
+  <Folder Name="/Gateways/">
+    <Project Path="src/Gateways/QuizMaster.Gateway/QuizMaster.Gateway.csproj" Id="1e16e42a-3195-4cf9-84e6-760151e021d8" />
+  </Folder>
+  <Folder Name="/Services/">
+    <Project Path="src/Services/Certificate.API/Certificate.API.csproj" Id="fcb6dd5f-80b3-4721-9167-6c7acc81ee0a" />
+    <Project Path="src/Services/Grading.Worker/Grading.Worker.csproj" />
+    <Project Path="src/Services/Quiz.API/Quiz.API.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+</Solution>
