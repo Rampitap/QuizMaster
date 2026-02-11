@@ -8,6 +8,7 @@
   <Folder Name="/Services/">
     <Project Path="src/Services/Certificate.API/Certificate.API.csproj" Id="fcb6dd5f-80b3-4721-9167-6c7acc81ee0a" />
     <Project Path="src/Services/Grading.Worker/Grading.Worker.csproj" />
+    <Project Path="src/Services/Identity.API/Identity.API.csproj" Id="21e34977-bb9e-44bc-8191-def19a24ff32" />
     <Project Path="src/Services/Quiz.API/Quiz.API.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
