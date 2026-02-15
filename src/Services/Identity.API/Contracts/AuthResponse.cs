@@ -1,5 +1,10 @@
 ﻿namespace Identity.API.Contracts;
 
-public class AuthResponse
-{
-}
+public record AuthResponse
+(
+
+    bool Success,
+    string Message,
+    string? Token = null,
+    UserDto? User = null
+);

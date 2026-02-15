@@ -1,10 +1,10 @@
 ﻿namespace Identity.API.Contracts;
 
-public record RegisterRequest
+public record UserDto
 (
+    Guid Id,
     string Email,
-    string Password,
     string FirstName,
     string LastName,
-    string PhoneNumber
+    string? PhoneNumber
 );

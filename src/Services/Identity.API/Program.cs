@@ -26,8 +26,10 @@ try
     builder.Services.AddControllers();
     builder.Services.AddOpenApi();
     builder.Host.UseSerilog();
+
     builder.Services.AddDbContext<AppIdentityDbContext>(options =>
        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    // Identity Configuration
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.Password.RequiredLength = 8;
@@ -37,17 +39,24 @@ try
     })
     .AddEntityFrameworkStores<AppIdentityDbContext>()
     .AddDefaultTokenProviders();
+
     builder.Services.AddOptions();
+    // Configure Resend Email Client
     builder.Services.AddHttpClient<IResend, ResendClient>();
     builder.Services.Configure<ResendClientOptions>(options =>
     {
         // Value comes from User Secrets or Env Variables
-        options.ApiKey = builder.Configuration["Resend:ApiKey"]!;
+        options.ApiToken = builder.Configuration["Resend:ApiKey"]!;
     });
     builder.Services.AddTransient<IResend, ResendClient>();
     builder.Services.AddTransient<IEmailSender<ApplicationUser>, ResendEmailSender>();
-    builder.Services.AddScoped<TokenService>();
+
+    builder.Services.AddScoped<ITokenService, TokenService>();
+
     builder.Services.AddScoped<IIdentityService, IdentityService>();
+
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddScoped<IUserContext, UserContext>();
 
 
     var app = builder.Build();
