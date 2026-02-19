@@ -2,10 +2,14 @@ using Identity.API.Data;
 using Identity.API.Interfaces;
 using Identity.API.Models;
 using Identity.API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Resend;
 using Serilog;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -17,6 +21,8 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
+    JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
     Log.Information("Identity.API is starting up...");
 
     var builder = WebApplication.CreateBuilder(args);
@@ -30,7 +36,7 @@ try
     builder.Services.AddDbContext<AppIdentityDbContext>(options =>
        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
     // Identity Configuration
-    builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
     {
         options.Password.RequiredLength = 8;
         options.Password.RequireDigit = true;
@@ -58,6 +64,17 @@ try
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddScoped<IUserContext, UserContext>();
 
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opt => {
+        opt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+
 
     var app = builder.Build();
 
@@ -69,6 +86,7 @@ try
 
     app.UseHttpsRedirection();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
@@ -76,6 +94,10 @@ try
     Log.Information("Identity.API is running.");
 
     app.Run();
+}
+catch (HostAbortedException) 
+{
+    throw;
 }
 catch (Exception ex)
 {

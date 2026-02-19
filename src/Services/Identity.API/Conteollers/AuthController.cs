@@ -26,12 +26,19 @@ public class AuthController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    [HttpGet("confirm-mail")]
+    [HttpGet("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string code) 
     {
+        Console.WriteLine($"==> Confirming email for User: {userId}");
+
         var result = await _identityService.ConfirmEmailAsync(userId, code);
 
-        return result.Success ? Ok(result) : BadRequest(result);
+        if (result.Success)
+        {
+            return Content("<h1>Email confirmed!</h1><p>You can now go back to Postman and Login.</p>", "text/html");
+        }
+
+        return BadRequest(result.Message);
     }
 
     [HttpPost("login")]
