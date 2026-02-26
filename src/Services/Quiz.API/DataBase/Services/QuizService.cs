@@ -1,28 +1,35 @@
 ﻿namespace Quiz.API.DataBase.Services;
+using EventBus.Messages.Events;
 using MassTransit;
 using MassTransit.Testing;
 using Quiz.API.Contracts;
 using Quiz.API.DataBase.Intefaces;
+using Quiz.API.DataBase.Repositories;
 using Quiz.API.Entities;
-using EventBus.Messages.Events;
 
 public class QuizService
 {
     private readonly IQuizRepository _quizRepository;
     private readonly IPublishEndpoint _publishEndpoint; 
-    public QuizService(IQuizRepository quizRepository, IPublishEndpoint publishEndpoint)
+    private readonly IUserContext _userContext;
+    public QuizService(IQuizRepository quizRepository, IPublishEndpoint publishEndpoint, IUserContext userContext)
     {
         _quizRepository = quizRepository;
         _publishEndpoint = publishEndpoint;
+        _userContext = userContext;
     }
     public async Task<bool> SumbitQuizAsync(string quizId, SubmitQuizRequest request) 
     {
         var quiz = await _quizRepository.GetByIdAsync(quizId);
+        var userId = _userContext.UserId;
+        var userEmail = _userContext.UserEmail;
         if (quiz == null) return false;
         var submissionEvent = new SubmissionEvent(
             Guid.NewGuid(),
-            request.UserId,
-            request.UserEmail,
+            userId.ToString(),
+            userEmail,
+            _userContext.FirstName,
+            _userContext.LastName,
             quizId,
             request.Answers.ToDictionary(a => a.QuestionId, a => a.SelectedOptionIndex.ToString())
         );

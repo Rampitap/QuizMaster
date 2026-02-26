@@ -63,6 +63,8 @@ public class SubmissionConsumer : IConsumer<SubmissionEvent>
             var passedEvent = new QuizPassedEvent(
                 data.UserId,
                 data.UserEmail,
+                data.FirstName,
+                data.LastName,
                 correctAnswers.Title,
                 score,
                 DateTimeOffset.UtcNow

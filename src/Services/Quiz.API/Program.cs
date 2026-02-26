@@ -1,11 +1,17 @@
 using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.IdentityModel.Tokens;
+using Quiz.API.DataBase.Intefaces;
+using Quiz.API.DataBase.Repositories;
 using Quiz.API.Extensions;
 using Quiz.API.Grpc;
 using Scalar.AspNetCore;
 using Serilog;
+using System.Text;
 
+System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 //serilog configuration
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -16,6 +22,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 try 
 {
+
     Log.Information("Quiz.API is starting");
 
     var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +40,25 @@ try
     builder.Services.AddOpenApi();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddGrpc();
+
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+   .AddJwtBearer(options => {
+       options.TokenValidationParameters = new TokenValidationParameters
+       {
+           ValidateIssuerSigningKey = true,
+           IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!)),
+           ValidateIssuer = true,
+           ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+           ValidateAudience = true,
+           ValidAudience = builder.Configuration["JwtSettings:Audience"],
+           ValidateLifetime = true,
+           // Map the Identity ID to the correct claim from Identity Service
+           NameClaimType = "sub"
+       };
+   });
+    builder.Services.AddAuthorization();
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddScoped<IUserContext, UserContext>();
 
     var app = builder.Build();
 

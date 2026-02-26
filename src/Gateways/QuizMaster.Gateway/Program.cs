@@ -33,6 +33,7 @@ try
             NameClaimType = "sub"
         };
     });
+    builder.Services.AddAuthorization();
 
     builder.Services.AddAuthorization(opt => {
         opt.AddPolicy("AuthenticatedUser", pb => pb.RequireAuthenticatedUser());

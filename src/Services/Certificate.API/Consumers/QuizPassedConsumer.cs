@@ -25,11 +25,12 @@ public class QuizPassedConsumer : IConsumer<QuizPassedEvent>
     public async Task Consume(ConsumeContext<QuizPassedEvent> context)
     {
         var data = context.Message;
+        var fullName = $"{data.FirstName} {data.LastName}";
         _logger.LogInformation("Received QuizPassedEvent for User: {UserId}, Quiz: {QuizTitle}", data.UserId, data.QuizTitle);
 
         // Generate certificate
         _logger.LogInformation("Generating PDF certificate...");
-        var pdfBytes = _certificateGenerator.Generate(data.UserId, data.QuizTitle, (int)data.Score);
+        var pdfBytes = _certificateGenerator.Generate(fullName, data.QuizTitle, (int)data.Score);
 
         // add to MinIO
         var fileName = $"{data.UserId}_{data.QuizTitle}_{DateTime.UtcNow:yyyyMMddHHmmss}.pdf";

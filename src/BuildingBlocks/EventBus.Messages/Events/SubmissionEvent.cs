@@ -4,6 +4,8 @@ public sealed record SubmissionEvent(
     Guid AttemptId,
     string UserId,
     string UserEmail,
+    string FirstName, 
+    string LastName,
     string QuizId,
     Dictionary<Guid, string> Answers
 );
