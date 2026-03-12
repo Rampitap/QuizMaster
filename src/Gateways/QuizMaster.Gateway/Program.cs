@@ -39,6 +39,8 @@ try
         opt.AddPolicy("AuthenticatedUser", pb => pb.RequireAuthenticatedUser());
     });
 
+    builder.Host.UseSerilog();
+
     // Add YARP
     builder.Services.AddReverseProxy()
         .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));

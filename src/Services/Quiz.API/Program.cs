@@ -10,12 +10,16 @@ using Quiz.API.Extensions;
 using Quiz.API.Grpc;
 using Scalar.AspNetCore;
 using Serilog;
+using Serilog.Events;
 using System.Text;
 
 System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 //serilog configuration
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("MassTransit", LogEventLevel.Information)
     .Enrich.FromLogContext()
     .Enrich.WithProperty("ApplicationName", "Quiz.API")
     .WriteTo.Console()
@@ -50,6 +54,7 @@ try
     builder.Services.AddOpenApi();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddGrpc();
+    builder.Host.UseSerilog();
 
     builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
    .AddJwtBearer(options => {

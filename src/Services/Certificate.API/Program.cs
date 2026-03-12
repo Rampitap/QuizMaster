@@ -10,12 +10,13 @@ using Serilog.Events;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("MassTransit", LogEventLevel.Information) 
     .Enrich.FromLogContext()
-    .Enrich.WithProperty("ApplicationName", "Grading.Worker")
+    .Enrich.WithProperty("ApplicationName", "Certificate.API") 
     .WriteTo.Console()
-    .WriteTo.Seq("http://localhost:5341")
+    .WriteTo.Seq("http://localhost:5341") 
     .CreateLogger();
 
 try
@@ -39,6 +40,7 @@ try
         };
         return new AmazonS3Client("admin", "minio_password", config);
     });
+    builder.Services.AddSerilog();
     builder.Services.AddMassTransit(x =>
     {
         x.AddConsumer<QuizPassedConsumer>();

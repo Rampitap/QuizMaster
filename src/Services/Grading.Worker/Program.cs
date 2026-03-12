@@ -8,15 +8,17 @@ using Serilog.Events;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("MassTransit", LogEventLevel.Information)
     .Enrich.FromLogContext()
     .Enrich.WithProperty("ApplicationName", "Grading.Worker")
     .WriteTo.Console()
     .WriteTo.Seq("http://localhost:5341")
     .CreateLogger();
 
-try 
+
+try
 { 
     Log.Information("Grading.Worker is starting");
 
@@ -24,6 +26,8 @@ try
 
     builder.Services.AddDbContext<GradingDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+    builder.Services.AddSerilog();
 
     builder.Services.AddMassTransit(x => 
     {
