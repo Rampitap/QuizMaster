@@ -53,10 +53,11 @@ public class CertificateGenerator : ICertificateGenerator
                     col.Item().AlignCenter().Text("This is to certify that").FontSize(16).Italic().FontColor(Colors.Grey.Darken1);
 
                     // User Name with a simple underline
-                    col.Item().AlignCenter().Column(nameCol =>
+                    col.Item().AlignCenter().Width(450).Column(nameCol =>
                     {
-                        nameCol.Item().Text(userName).FontSize(36).Bold().FontColor(Colors.Blue.Darken3);
-                        nameCol.Item().Width(350).LineHorizontal(2).LineColor(Colors.Blue.Darken3);
+                        
+                        nameCol.Item().AlignCenter().Text(userName).FontSize(36).Bold().FontColor(Colors.Blue.Darken3);
+                        nameCol.Item().PaddingTop(2).LineHorizontal(1.5f).LineColor(Colors.Blue.Darken3);
                     });
 
                     // Assessment Details
