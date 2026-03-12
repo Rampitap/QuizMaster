@@ -1,10 +1,11 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Util;
+using Certificate.API.Interfaces;
 
 namespace Certificate.API.Services;
 
-public class S3StorageService
+public class S3StorageService : IStorageService
 {
     private readonly IAmazonS3 _s3Client;
     private readonly IConfiguration _config;

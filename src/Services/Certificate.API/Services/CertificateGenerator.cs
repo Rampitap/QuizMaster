@@ -1,11 +1,12 @@
 ﻿using Amazon.S3.Model;
+using Certificate.API.Interfaces;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace Certificate.API.Services;
 
-public class CertificateGenerator
+public class CertificateGenerator : ICertificateGenerator
 {
     public byte[] Generate(string userName, string quizTitle, int score) 
     {

@@ -16,7 +16,7 @@ public static class DbExtensions
         services.AddSingleton<IMongoDatabase>(mongoClient.GetDatabase(databaseName));
 
         services.AddScoped<IQuizRepository, QuizRepository>();
-        services.AddScoped<QuizService>();
+        services.AddScoped<IQuizService, QuizService>();
 
         return services;
     }

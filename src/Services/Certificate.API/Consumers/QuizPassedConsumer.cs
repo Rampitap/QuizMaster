@@ -1,5 +1,6 @@
 ﻿using Amazon.Runtime.Internal.Util;
 using Certificate.API.Data;
+using Certificate.API.Interfaces;
 using Certificate.API.Models;
 using Certificate.API.Services;
 using EventBus.Messages.Events;
@@ -9,12 +10,12 @@ namespace Certificate.API.Consumers;
 
 public class QuizPassedConsumer : IConsumer<QuizPassedEvent>
 {
-    private readonly CertificateGenerator _certificateGenerator;
-    private readonly S3StorageService _storage;
+    private readonly ICertificateGenerator _certificateGenerator;
+    private readonly IStorageService _storage;
     private readonly CertificateDbContext _dbContext;
     private readonly ILogger<QuizPassedConsumer> _logger;
 
-    public QuizPassedConsumer(CertificateGenerator certificateGenerator, S3StorageService storage, CertificateDbContext dbContext, ILogger<QuizPassedConsumer> logger)
+    public QuizPassedConsumer(ICertificateGenerator certificateGenerator, IStorageService storage, CertificateDbContext dbContext, ILogger<QuizPassedConsumer> logger)
     {
         _certificateGenerator = certificateGenerator;
         _storage = storage;

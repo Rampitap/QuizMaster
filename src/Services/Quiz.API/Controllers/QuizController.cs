@@ -2,11 +2,12 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Quiz.API.Contracts;
+using Quiz.API.DataBase.Intefaces;
 using Quiz.API.DataBase.Services;
 
 [ApiController]
 [Route("api/[controller]")]
-public class QuizController(QuizService quizService) : ControllerBase
+public class QuizController(IQuizService quizService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> Get() => Ok(await quizService.GetQuizzesAsync());

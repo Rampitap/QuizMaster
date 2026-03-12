@@ -7,7 +7,7 @@ using Quiz.API.DataBase.Intefaces;
 using Quiz.API.DataBase.Repositories;
 using Quiz.API.Entities;
 
-public class QuizService
+public class QuizService : IQuizService
 {
     private readonly IQuizRepository _quizRepository;
     private readonly IPublishEndpoint _publishEndpoint; 

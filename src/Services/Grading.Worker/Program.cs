@@ -4,9 +4,12 @@ using Grading.Worker.Data;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Serilog.Events;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .Enrich.WithProperty("ApplicationName", "Grading.Worker")
     .WriteTo.Console()
@@ -25,6 +28,16 @@ try
     builder.Services.AddMassTransit(x => 
     {
         x.AddConsumer<SubmissionConsumer>();
+
+        x.AddEntityFrameworkOutbox<GradingDbContext>(o =>
+        {
+            
+            o.UsePostgres();
+
+            o.UseBusOutbox();
+
+            o.QueryDelay = TimeSpan.FromSeconds(1);
+        });
 
         x.UsingRabbitMq((context, cfg) => 
         {

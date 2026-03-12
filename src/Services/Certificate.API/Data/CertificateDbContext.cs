@@ -1,4 +1,5 @@
 ﻿using Certificate.API.Models;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Certificate.API.Data;
@@ -14,6 +15,11 @@ public class CertificateDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<CertificateMetaData>().Property(x => x.UserId).IsRequired();
+
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
     }
 }

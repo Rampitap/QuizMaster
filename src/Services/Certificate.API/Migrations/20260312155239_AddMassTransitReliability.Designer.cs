@@ -3,6 +3,7 @@ using System;
 using Certificate.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Certificate.API.Migrations
 {
     [DbContext(typeof(CertificateDbContext))]
-    partial class CertificateDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260312155239_AddMassTransitReliability")]
+    partial class AddMassTransitReliability
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using Quiz.API.DataBase.Intefaces;
 using Quiz.API.DataBase.Repositories;
 using Quiz.API.Extensions;
@@ -31,9 +32,18 @@ try
     builder.Services.AddMongoDb(builder.Configuration);
     builder.Services.AddMassTransit(x =>
     {
+        x.AddMongoDbOutbox(o =>
+        {
+            o.DisableInboxCleanupService(); 
+            o.ClientFactory(sp => sp.GetRequiredService<IMongoClient>());
+            o.DatabaseFactory(sp => sp.GetRequiredService<IMongoDatabase>());
+        });
+
+
         x.UsingRabbitMq((context, cfg) =>
         {
             cfg.Host(builder.Configuration["RabbitMqSettings:Host"] ?? "localhost");
+            cfg.ConfigureEndpoints(context);
         });
     });
     builder.Services.AddControllers();

@@ -1,15 +1,19 @@
 using Amazon.S3;
 using Certificate.API.Consumers;
 using Certificate.API.Data;
+using Certificate.API.Interfaces;
 using Certificate.API.Services;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Serilog.Events;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
     .Enrich.FromLogContext()
-    .Enrich.WithProperty("ApplicationName", "Certificate.API")
+    .Enrich.WithProperty("ApplicationName", "Grading.Worker")
     .WriteTo.Console()
     .WriteTo.Seq("http://localhost:5341")
     .CreateLogger();
@@ -39,6 +43,16 @@ try
     {
         x.AddConsumer<QuizPassedConsumer>();
 
+        x.AddEntityFrameworkOutbox<CertificateDbContext>(o =>
+        {
+
+            o.UsePostgres();
+
+            o.UseBusOutbox();
+
+            o.QueryDelay = TimeSpan.FromSeconds(1);
+        });
+
         x.UsingRabbitMq((context, cfg) =>
         {
             cfg.Host("localhost", "/", h =>
@@ -50,8 +64,8 @@ try
             cfg.ConfigureEndpoints(context);
         });
     });
-    builder.Services.AddScoped<CertificateGenerator>();
-    builder.Services.AddScoped<S3StorageService>();
+    builder.Services.AddScoped<ICertificateGenerator, CertificateGenerator>();
+    builder.Services.AddScoped<IStorageService, S3StorageService>();
 
     var app = builder.Build();
 
